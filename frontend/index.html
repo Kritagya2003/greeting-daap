@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head><title>Greeting dApp</title></head>
+  <body>
+    <h1>Greeting dApp</h1>
+    <p><strong>Current Message:</strong> <span id="message">Loading...</span></p>
+    <input id="newMessage" placeholder="Enter new message" />
+    <button onclick="setGreeting()">Update Greeting</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script>
+      let web3, contract;
+      const contractAddress = '0x05e21EB8B6b3F02229593A7642b28e15954df1D7';
+      const abi = 
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "_message",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [],
+        "name": "message",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "_newMessage",
+                "type": "string"
+            }
+        ],
+        "name": "setMessage",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+];
+
+      async function loadContract() {
+        if (window.ethereum) {
+          await ethereum.request({ method: 'eth_requestAccounts' });
+          web3 = new Web3(window.ethereum);
+          contract = new web3.eth.Contract(abi, contractAddress);
+          const message = await contract.methods.message().call();
+          document.getElementById('message').innerText = message;
+        }
+      }
+
+      async function setGreeting() {
+        const accounts = await web3.eth.getAccounts();
+        const newMsg = document.getElementById('newMessage').value;
+        await contract.methods.setMessage(newMsg).send({ from: accounts[0] });
+        const message = await contract.methods.message().call();
+        document.getElementById('message').innerText = message;
+      }
+
+      loadContract();
+    </script>
+  </body>
+</html>
